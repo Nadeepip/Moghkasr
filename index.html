@@ -685,7 +685,7 @@
                 <div id="portal-progress-bar" style="background:linear-gradient(90deg, #ff007f, #aa00ff, #00b0ff); width:0%; height:100%; transition:width 0.2s;"></div>
             </div>
             <p id="portal-submit-status-text" style="font-size:12pt; color:#555; font-weight:bold; line-height:1.6; direction:rtl;"></p>
-            <button id="portal-retry-submit-btn" style="display:none; margin:15px auto 0; background:#e74c3c; color: white; padding: 10px 20px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer;" onclick="retrySubmission()">🔄 تلاش مجدد برای ارسال</button>
+            <button id="portal-retry-submit-btn" class="btn-start-new" style="display:none; margin:15px auto 0; background:#e74c3c; color: white; padding: 10px 20px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer;" onclick="retrySubmission()">🔄 تلاش مجدد برای ارسال</button>
           </div>
         </div>
 
@@ -715,7 +715,6 @@
 
             <div id="portal-back-instruction" style="display:none; width: 100%;"></div>
             
-            <button id="btn-whatsapp" style="background:#25D366;" onclick="sendWhatsApp()">ارسال به آقای معلم</button>
             <button id="btn-restart" style="background:#e74c3c; margin-bottom: 20px;" onclick="restartGame()">شروع مجدد کل بازی</button>
         </div>
     </div>
@@ -728,7 +727,7 @@
     document.addEventListener('contextmenu', event => event.preventDefault());
 
     let state = {
-        user: { name: '', totalGames: 0, totalStars: 0, currentScreen: 'register', answerKeyUsedCount: 0 },
+        user: { name: '', totalGames: 0, totalStars: 0, currentScreen: 'register' },
         level: { index: 0 },
         currentQ: { f1: null, f2: null, type: 1, multiplier: 1 },
         sessionStars: 0,
@@ -784,7 +783,6 @@
             try {
                 state = JSON.parse(saved);
                 if (typeof state.user.currentScreen === 'undefined') state.user.currentScreen = 'register';
-                if (typeof state.user.answerKeyUsedCount === 'undefined') state.user.answerKeyUsedCount = 0;
             } catch(e){}
         }
     }
@@ -1314,7 +1312,6 @@
         backInstruction.style.display = 'none';
 
         if (Portal.isPortalMode) {
-            document.getElementById('btn-whatsapp').style.display = 'none';
             if (goalReached) {
                 goalBadge.style.display = 'block';
                 btnRestart.style.display = 'none';
@@ -1339,25 +1336,7 @@
             }
         } else {
             btnRestart.style.display = 'block';
-            document.getElementById('btn-whatsapp').style.display = 'block';
         }
-    }
-
-    function sendWhatsApp() {
-        const now = new Date();
-        const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', calendar: 'persian' };
-        const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
-        const pDate = new Intl.DateTimeFormat('fa-IR', dateOptions).format(now);
-        const pTime = new Intl.DateTimeFormat('fa-IR', timeOptions).format(now);
-
-        const txt = `*کارنامه ریاضی (مقایسه‌ی کسرها)* 📊\n` +
-                    `🏫 مدرسه: دبستان معاد خرگوشی\n` +
-                    `👤 دانش‌آموز: ${state.user.name}\n` +
-                    `📅 تاریخ: ${pDate}\n` +
-                    `🕒 ساعت: ${pTime}\n` +
-                    `🎮 تعداد دوره‌های کامل: ${toPersianNum(state.user.totalGames)}\n` +
-                    `⭐ مجموع ستاره‌ها: ${toPersianNum(state.user.totalStars)}`;
-        window.location.href = `whatsapp://send?phone=${TEACHER_PHONE}&text=${encodeURIComponent(txt)}`;
     }
 
     function restartGame() {
