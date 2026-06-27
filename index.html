@@ -556,7 +556,7 @@
             </div>
             <button id="startGameBtn" style="background:#27ae60; color:white; width: 100%;" onclick="registerUser()">شروع بازی تکلیف 🎮</button>
             
-            <div id="portal-error-section" style="display:none; text-align:center; padding:20px; max-width: 450px; margin: 20px auto; background: white; border-radius: 12px; box-shadow:0 6px 18px rgba(0,0,0,0.12); width:100%;">
+            <div id="portal-error-section" style="display:none; text-align:center; padding:20px; max-width: 450px; margin: 12px auto; background: white; border-radius: 12px; box-shadow:0 6px 18px rgba(0,0,0,0.12); width:100%;">
                 <div style="font-size:2.5rem; margin-bottom:10px;">⚠️</div>
                 <h3 id="portal-error-title" style="color:#d32f2f; margin-bottom:8px; font-weight:bold; font-size:15pt;">خطا در اتصال به پرتال کلاس</h3>
                 <p id="portal-error-desc" style="color:#555; font-size:12pt; margin-bottom:15px; line-height:1.6;">جهت بارگذاری مشخصات و تکالیفت، اتصال به اینترنت الزامی است. لطفا شبکه‌ات را بررسی کن و مجدداً تلاش کن.</p>
@@ -783,7 +783,6 @@
         localStorage.setItem(STORAGE, JSON.stringify(state));
     }
 
-    // gameState_MoghayeSehKasr
     function saveGameState() {
         localStorage.setItem(GAME_STATE_STORAGE, JSON.stringify({
             levelIndex: state.level.index,
@@ -866,7 +865,7 @@
 
     function setQuestionText(type) {
         if(type === 1) return "مخرج‌ها برابرند. کدام کسر بزرگتر است؟";
-        if(type === 2) return "صورت‌ها برابرند. کدام کسر بزرگتر است؟";
+        if(type === 2) return "صورت‌ها برابرند. کدام کسر بزرگتر است？";
         if(type === 3) return "ابتدا کسر مساوی را بنویسید، سپس مقایسه کنید.";
         return "متن سوال";
     }
@@ -1266,7 +1265,7 @@
         const pDate = new Intl.DateTimeFormat('fa-IR', dateOptions).format(now);
         const pTime = new Intl.DateTimeFormat('fa-IR', timeOptions).format(now);
 
-        if (Portal.isPortalMode && !onlyShow) {
+        if (Portal.isPortalMode) {
             showScreen('portal-submitting-screen');
             await Portal.submitProgress(1, {
                 onSuccess: (data) => {
@@ -1281,8 +1280,7 @@
             });
         } else {
             showScreen('screen-report');
-            const isGoalReached = Portal.isPortalMode ? (parseInt(state.user.totalStars) >= parseInt(Portal.requiredStars)) : false;
-            renderReport(isGoalReached, state.user.totalStars, pDate, pTime);
+            renderReport(false, state.user.totalStars, pDate, pTime);
         }
     }
 
@@ -1306,7 +1304,6 @@
         backInstruction.style.display = 'none';
 
         if (Portal.isPortalMode) {
-            document.getElementById('btn-whatsapp').style.display = 'none';
             if (goalReached) {
                 goalBadge.style.display = 'block';
                 btnRestart.style.display = 'none';
@@ -1331,25 +1328,7 @@
             }
         } else {
             btnRestart.style.display = 'block';
-            document.getElementById('btn-whatsapp').style.display = 'block';
         }
-    }
-
-    function sendWhatsApp() {
-        const now = new Date();
-        const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', calendar: 'persian' };
-        const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
-        const pDate = new Intl.DateTimeFormat('fa-IR', dateOptions).format(now);
-        const pTime = new Intl.DateTimeFormat('fa-IR', timeOptions).format(now);
-
-        const txt = `*کارنامه ریاضی (مقایسه‌ی کسرها)* 📊\n` +
-                    `🏫 مدرسه: دبستان معاد خرگوشی\n` +
-                    `👤 دانش‌آموز: ${state.user.name}\n` +
-                    `📅 تاریخ: ${pDate}\n` +
-                    `🕒 ساعت: ${pTime}\n` +
-                    `🎮 تعداد دوره‌های کامل: ${toPersianNum(state.user.totalGames)}\n` +
-                    `⭐ مجموع ستاره‌ها: ${toPersianNum(state.user.totalStars)}`;
-        window.location.href = `whatsapp://send?phone=${TEACHER_PHONE}&text=${encodeURIComponent(txt)}`;
     }
 
     function restartGame() {
