@@ -55,7 +55,7 @@
 
         .hidden { display: none !important; }
         .screen {
-            display: none !important;
+            display: none;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
@@ -68,7 +68,7 @@
         }
 
         .screen.active {
-            display: flex !important;
+            display: flex;
         }
         
         #screen-register {
@@ -728,13 +728,12 @@
     document.addEventListener('contextmenu', event => event.preventDefault());
 
     let state = {
-        user: { name: '', totalGames: 0, totalStars: 0, currentScreen: 'register', reportSent: false },
+        user: { name: '', totalGames: 0, totalStars: 0, currentScreen: 'register', answerKeyUsedCount: 0 },
         level: { index: 0 },
         currentQ: { f1: null, f2: null, type: 1, multiplier: 1 },
         sessionStars: 0,
         helpUsed: false,
-        gameFinished: false,
-        reportSent: false
+        gameFinished: false
     };
 
     function toPersianNum(n) {
@@ -785,7 +784,7 @@
             try {
                 state = JSON.parse(saved);
                 if (typeof state.user.currentScreen === 'undefined') state.user.currentScreen = 'register';
-                if (typeof state.reportSent === 'undefined') state.reportSent = false;
+                if (typeof state.user.answerKeyUsedCount === 'undefined') state.user.answerKeyUsedCount = 0;
             } catch(e){}
         }
     }
@@ -860,7 +859,6 @@
             state.sessionStars = 0;
             state.helpUsed = false;
             state.gameFinished = false;
-            state.reportSent = false;
             saveGameState();
         }
         saveState();
@@ -1264,7 +1262,6 @@
             state.user.totalGames++; 
             state.gameFinished = true;
             state.level.index = 9; 
-            state.reportSent = false;
         }
         
         clearGameState();
@@ -1347,9 +1344,6 @@
     }
 
     function sendWhatsApp() {
-        state.reportSent = true;
-        saveState();
-
         const now = new Date();
         const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', calendar: 'persian' };
         const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
@@ -1364,18 +1358,12 @@
                     `🎮 تعداد دوره‌های کامل: ${toPersianNum(state.user.totalGames)}\n` +
                     `⭐ مجموع ستاره‌ها: ${toPersianNum(state.user.totalStars)}`;
         window.location.href = `whatsapp://send?phone=${TEACHER_PHONE}&text=${encodeURIComponent(txt)}`;
-        
-        const btn = document.getElementById('btn-whatsapp');
-        btn.innerText = 'ارسال شد ✅';
-        btn.disabled = true;
-        btn.style.background = '#95a5a6';
     }
 
     function restartGame() {
         state.level.index = 0;
         state.helpUsed = false;
         state.gameFinished = false;
-        state.reportSent = false;
         state.user.currentScreen = 'game';
         saveGameState();
         saveState();
@@ -1419,7 +1407,6 @@
                     try {
                         state = JSON.parse(saved);
                         if (typeof state.user.currentScreen === 'undefined') state.user.currentScreen = 'register';
-                        if (typeof state.reportSent === 'undefined') state.reportSent = false;
                     } catch (e) {}
                 } else {
                     state = {
@@ -1427,15 +1414,13 @@
                             name: data.name,
                             totalGames: data.plays,
                             totalStars: data.stars,
-                            currentScreen: 'register',
-                            reportSent: false
+                            currentScreen: 'register'
                         },
                         level: { index: 0 },
                         currentQ: { f1: null, f2: null, type: 1, multiplier: 1 },
                         sessionStars: 0,
                         helpUsed: false,
-                        gameFinished: false,
-                        reportSent: false
+                        gameFinished: false
                     };
                 }
                 
